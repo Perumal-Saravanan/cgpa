@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA & CGPA Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #courses, #semesters {
+            margin-bottom: 20px;
+        }
+        .course, .semester {
+            margin-bottom: 10px;
+        }
+        .course input, .semester input {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Semester GPA & Overall CGPA Calculator</h1>
+
+    <div id="courses">
+        <!-- Courses will be added here dynamically -->
+    </div>
+
+    <button onclick="addCourse()">Add Course</button>
+    <button onclick="deleteLastCourse()">Delete Last Course</button>
+    <button onclick="calculateGPA()">Calculate GPA</button>
+
+    <h2>Your Semester GPA: <span id="gpaResult"></span></h2>
+    <h3>Total Credits: <span id="totalCredits"></span></h3>
+
+    <h2>Calculate CGPA</h2>
+    <div id="semesters">
+        <!-- Semesters will be added here dynamically -->
+    </div>
+
+    <button onclick="addSemester()">Add Semester</button>
+    <button onclick="deleteLastSemester()">Delete Last Semester</button>
+    <button onclick="calculateCGPA()">Calculate CGPA</button>
+
+    <h2>Your CGPA: <span id="cgpaResult"></span></h2>
+
+    <script>
+        let courseCount = 0;
+        let semesterCount = 0;
+
+        function addCourse() {
+            courseCount++;
+            const courseDiv = document.createElement('div');
+            courseDiv.className = 'course';
+            courseDiv.innerHTML = `
+                <label>Course ${courseCount}:</label>
+                <input type="number" class="credits" placeholder="Credits" required>
+                <input type="text" class="grade" placeholder="Grade (e.g., A, B+)" required>
+            `;
+            document.getElementById('courses').appendChild(courseDiv);
+        }
+
+        function deleteLastCourse() {
+            const courses = document.getElementById('courses');
+            if (courses.lastChild) {
+                courses.removeChild(courses.lastChild);
+                courseCount--;
+            }
+        }
+
+        function getGradePoint(grade) {
+            const gradePoints = {
+                'O': 10,
+                'A+': 9,
+                'A': 8,
+                'B+': 7,
+                'B': 6,
+                'C': 5,
+                'RA': 0,
+                'SA': 0,
+                'W': 0
+            };
+            return gradePoints[grade.toUpperCase()] || 0;  // Default to 0 if the grade is not found
+        }
+
+        function calculateGPA() {
+            let totalCredits = 0;
+            let weightedGradePoints = 0;
+
+            const courses = document.querySelectorAll('.course');
+            courses.forEach(course => {
+                let credits = parseFloat(course.querySelector('.credits').value);
+                let grade = course.querySelector('.grade').value.trim();
+                let gradePoint = getGradePoint(grade);
+                
+                totalCredits += credits;
+                weightedGradePoints += credits * gradePoint;
+            });
+
+            let gpa = weightedGradePoints / totalCredits;
+            document.getElementById('gpaResult').innerText = gpa.toFixed(2);
+            document.getElementById('totalCredits').innerText = totalCredits.toFixed(2);
+        }
+
+        function addSemester() {
+            semesterCount++;
+            const semesterDiv = document.createElement('div');
+            semesterDiv.className = 'semester';
+            semesterDiv.innerHTML = `
+                <label>Semester ${semesterCount}:</label>
+                <input type="number" class="semCredits" placeholder="Total Credits" required>
+                <input type="number" step="0.01" class="gpa" placeholder="GPA" required>
+            `;
+            document.getElementById('semesters').appendChild(semesterDiv);
+        }
+
+        function deleteLastSemester() {
+            const semesters = document.getElementById('semesters');
+            if (semesters.lastChild) {
+                semesters.removeChild(semesters.lastChild);
+                semesterCount--;
+            }
+        }
+
+        function calculateCGPA() {
+            let totalCredits = 0;
+            let weightedGPA = 0;
+
+            const semesters = document.querySelectorAll('.semester');
+            semesters.forEach(semester => {
+                let semCredits = parseFloat(semester.querySelector('.semCredits').value);
+                let gpa = parseFloat(semester.querySelector('.gpa').value);
+                
+                totalCredits += semCredits;
+                weightedGPA += semCredits * gpa;
+            });
+
+            let cgpa = weightedGPA / totalCredits;
+            document.getElementById('cgpaResult').innerText = cgpa.toFixed(2);
+        }
+    </script>
+</body>
+</html>
